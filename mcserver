@@ -1,0 +1,55 @@
+#!/bin/bash
+# Minecraft / Bukkit
+# Server Management Script
+# Original: DevNull @ minecraft-server.eu
+# Erweitert durch: Robin Groppe + Timo Sabath
+# Website: http://www.makroplay.com
+# GNU General Public License v2
+#######################
+# Variablen ###########
+#######################
+name="minecraft_server"
+ort="/home/makroplay/mc_server"
+bin="craftbukkit.jar"
+maxmem="4G"
+editor="nano"
+cfg="server.properties"
+#######################
+# Script ##############
+#######################
+case "$1" in
+        start)
+                tmux new -d -s ${name} "cd ${ort} && java -Xmx${maxmem} -jar ${bin} -o true"
+                echo "Server wird gestartet"
+                ;;
+        stop)
+		tmux send -t ${name} save-all ENTER && tmux send -t ${name} stop ENTER
+                echo "Server wurde gestoppt"
+                ;;
+        restart)
+		tmux send -t ${name} save-all ENTER && tmux send -t ${name} stop ENTER && tmux new -d -s ${name} "cd ${ort} && java -Xmx${maxmem} -jar ${bin} -o true"
+		echo "Server wurde neugestartet"
+		;;
+	clean)
+                echo -n > ${ort}/server.log
+                echo "server.log wurde geleert"
+                ;;
+        console)
+                tmux attach -t ${name}
+                ;;
+	debug)
+		tmux new -d -s ${name} "cd ${ort} && java -Xmx${maxmem} -jar ${bin} -o true" && tmux attach -t ${name}
+		;;
+	backup)
+		jetzt="$(date +%d-%m-%Y_%H-%M)"
+                tar vcfz ${ort}/backups/serverbackup_${jetzt}.bak.tar.gz ${ort} --exclude=*.bak.tar.gz
+                echo "Serverbackup abgeschlossen"
+                ;;
+	settings)
+		${editor} ${ort}/${cfg}
+		;;
+        *)
+                echo "Read The Fucking Manual ;) ${0} {start|stop|restart|debug|console|clean|backup|settings}"
+                exit 1
+esac
+exit 0
