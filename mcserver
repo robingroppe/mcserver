@@ -27,7 +27,7 @@ case "$1" in
                 echo "Server wurde gestoppt"
                 ;;
         restart)
-		tmux send -t ${name} save-all ENTER && tmux send -t ${name} stop ENTER && tmux new -d -s ${name} "cd ${ort} && java -Xmx${maxmem} -jar ${bin} -o true"
+		tmux send -t ${name} save-all ENTER && tmux send -t ${name} stop ENTER && sleep 2 && tmux new -d -s ${name} "cd ${ort} && java -Xmx${maxmem} -jar ${bin} -o true"
 		echo "Server wurde neugestartet"
 		;;
 	clean)
